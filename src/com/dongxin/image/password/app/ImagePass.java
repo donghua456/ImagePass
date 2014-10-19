@@ -71,7 +71,7 @@ public class ImagePass extends JFrame implements ModeChangeListener {
 			}
 			encryptionPanel.setVisible(true);
 			this.setContentPane(encryptionPanel);
-			System.err.println("Change to encryption");
+//			System.err.println("Change to encryption");
 		} else if (ImagePassMode.Decryption == mode) {
 			if (encryptionPanel != null) {
 				encryptionPanel.setVisible(false);
@@ -83,7 +83,7 @@ public class ImagePass extends JFrame implements ModeChangeListener {
 			decryptionPanel.setVisible(true);
 			this.setContentPane(decryptionPanel);
 
-			System.err.println("Change to decryption");
+//			System.err.println("Change to decryption");
 		}
 
 	}
