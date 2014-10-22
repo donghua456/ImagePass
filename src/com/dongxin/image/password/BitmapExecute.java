@@ -24,38 +24,9 @@ public class BitmapExecute {
 	private static int Data_End_Flag = 93;
 	private static int Data_Size_Error = -1;
 	private static int Data_Size_Bits = 32;
-	
-	/** */
-	/**
-	 * 将BufferedImage转化为bmp文件保存在指定位�?
-	 * 
-	 * @param image
-	 * @param file
-	 * @return
-	 */
-	private static boolean saveBMP(BufferedImage image, File file) {
-		// 格式化为bmp文件
 
-		Iterator writers = ImageIO.getImageWritersByFormatName("bmp");
-		ImageWriter writer = (ImageWriter) writers.next();
-		ImageOutputStream ios = null;
-		try {
-			ios = ImageIO.createImageOutputStream(new FileOutputStream(file));
-		} catch (IOException ioe) {
-			return false;
-		}
-		writer.setOutput(ios);
-		try {
-			writer.write(image);
-		} catch (IOException ioe) {
-			return false;
-		}
-		return true;
-	}
-
-	/** */
 	/**
-	 * 将数据文件隐藏入bmp文件�?
+	 * 将数据文件隐藏入bmp文件
 	 * 
 	 * @param dataFileName
 	 * @param bmpFileName
@@ -68,9 +39,8 @@ public class BitmapExecute {
 		return DataSourceToBMP(new File(dataFileName), new File(bmpFileName), outFileName);
 	}
 
-	/** */
 	/**
-	 * 将数据文件隐藏入bmp文件�?
+	 * 将数据文件隐藏入bmp文件
 	 * 
 	 * @param dataFileName
 	 * @param bmpFileName
@@ -78,76 +48,62 @@ public class BitmapExecute {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean DataSourceToBMP(File dataFile, File bmpFile, String outFileName) throws IOException {
+	private static boolean DataSourceToBMP(File dataFile, File bmpFile, String outFileName) throws IOException {
 		FileInputStream dataStream = new FileInputStream(dataFile);
 		BufferedImage bmp;
 		try {
 			bmp = ImageIO.read(bmpFile);
-		} catch (Exception ex) {
-			return false;
-		}
-		if (dataStream.available() == 0) {
-			return false;
-		}
-		int maxByteStorage = (bmp.getHeight() * bmp.getWidth() * 3) / 8;
-		
-		// bmp文件必须较要隐藏的文件为大，否则无法注入文件
-		if (maxByteStorage < dataStream.available() + 500) {
-			System.err.println("bmp文件太小");
-			return false;
-		}
-		BitmapOutput bmpWriter = new BitmapOutput(bmp);
-		int dataSize = dataStream.available();
-		System.out.println("data size: " + dataSize);
-		try {
-			
-//////////////////////////////////////////////////////////////////
-			//save data size into image
-//			bmpWriter.writeByte(dataSize);
-			
-			
-			dataSizeToBMP(dataSize, bmpWriter);
-			
-			
-//			for (int u = 0; u < 500; u++) {
-//				bmpWriter.writeByte(dataSize);
-//			}
-/////////////////////////////////////////////////////////////////			
-			
-			// 标记出完整数�?
-			System.out.print("read a byte: ");
-			
-			bmpWriter.writeByte(Data_Start_Flag);
-			for (int u = 0; u < dataSize; u++) {
-				int result = dataStream.read();
 
-				System.out.print(result + ", ");
-				
-				if (result == Data_Start_Flag) {
-					bmpWriter.writeByte(123);
-				} else if (result == Data_End_Flag) {
-					bmpWriter.writeByte(125);
-				} else {
-					bmpWriter.writeByte(result);
-				}
+			if (dataStream.available() == 0) {
+				return false;
 			}
-			bmpWriter.writeByte(Data_End_Flag);
+			int maxByteStorage = (bmp.getHeight() * bmp.getWidth() * 3) / 8;
+
+			// bmp文件必须较要隐藏的文件为大，否则无法注入文件
+			if (maxByteStorage < dataStream.available() + 500) {
+				System.err.println("bmp文件太小");
+				return false;
+			}
+			BitmapOutput bmpWriter = new BitmapOutput(bmp);
+
+			dataSourceToBMP(dataStream, bmpWriter);
+			
+			saveBMP(bmpWriter, outFileName);
 		} catch (Exception ex) {
 			ex.getStackTrace();
 			return false;
-		}
-		try {
-			File file = new File(outFileName);
-			if (file.exists()) {
-				file.delete();
+		} finally {
+			if (dataStream != null) {
+				dataStream.close();
 			}
-			// 保存BufferedImage为bmp文件
-			saveBMP(bmpWriter.getBufferedImage(), new File(outFileName));
-		} catch (Exception ex) {
-			ex.getStackTrace();
-			return false;
 		}
 		return true;
+	}
+	
+	private static void dataSourceToBMP(FileInputStream dataStream, BitmapOutput bmpWriter) throws Exception {
+		int dataSize = dataStream.available();
+		System.out.println("data size: " + dataSize);
+
+		dataSizeToBMP(dataSize, bmpWriter);
+
+		// 标记出完整数
+		System.out.print("read a byte: ");
+		bmpWriter.writeByte(Data_Start_Flag);
+		for (int u = 0; u < dataSize; u++) {
+			int result = dataStream.read();
+
+			System.out.print(result + ", ");
+
+			if (result == Data_Start_Flag) {
+				bmpWriter.writeByte(123);
+			} else if (result == Data_End_Flag) {
+				bmpWriter.writeByte(125);
+			} else {
+				bmpWriter.writeByte(result);
+			}
+		}
+		bmpWriter.writeByte(Data_End_Flag);
+
 	}
 	
 	private static void dataSizeToBMP(int dataSize, BitmapOutput bmpWriter) {
@@ -167,10 +123,37 @@ public class BitmapExecute {
 			bmpWriter.writeByte(0);
 		}
 	}
+	
+	private static void saveBMP(BitmapOutput bmpWriter, String fileName) throws Exception {
+		File file = new File(fileName);
+		if (file.exists()) {
+			file.delete();
+		}
 
-	/** */
+		saveBMP(bmpWriter.getBufferedImage(), new File(fileName));
+	}
+	
 	/**
-	 * 从bmp文件中导出隐藏数�?由于隐藏数据的方式不同，只对此类隐藏的有�?
+	 * Save BufferedImage转化为bmp文件保存在指定位
+	 * 
+	 * @param image
+	 * @param file
+	 * @return
+	 */
+	private static void saveBMP(BufferedImage image, File file) throws Exception {
+		Iterator writers = ImageIO.getImageWritersByFormatName("bmp");
+		ImageWriter writer = (ImageWriter) writers.next();
+		ImageOutputStream ios = null;
+
+		ios = ImageIO.createImageOutputStream(new FileOutputStream(file));
+
+		writer.setOutput(ios);
+
+		writer.write(image);
+	}
+
+	/**
+	 * 从bmp文件中导出隐藏数由于隐藏数据的方式不同，只对此类隐藏的有
 	 * 
 	 * @param bmpFileName
 	 * @param outFName
@@ -181,16 +164,15 @@ public class BitmapExecute {
 		return BMPToDataSource(new File(bmpFileName), outFName);
 	}
 
-	/** */
 	/**
-	 * 从bmp文件中导出隐藏数�?由于隐藏数据的方式不同，只对此类隐藏的有�?
+	 * 从bmp文件中导出隐藏数由于隐藏数据的方式不同，只对此类隐藏的有
 	 * 
 	 * @param bmpFile
 	 * @param outFName
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean BMPToDataSource(File bmpFile, String outFName) throws IOException {
+	private static boolean BMPToDataSource(File bmpFile, String outFName) throws IOException {
 		BufferedImage image = ImageIO.read(bmpFile);
 		BitmapInput bmpReader;
 		try {
@@ -216,7 +198,7 @@ public class BitmapExecute {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 			dataSize = getDataSize(bmpReader);
 //			for (int u = 0; u < 500; u++) {
-//				// 以对象数组返回body和验证布尔�?
+//				// 以对象数组返回body和验证布尔�?
 //
 //				Object[] object = bmpReader.readByte(outByte);
 //				boolean header = Boolean.parseBoolean((String) object[0]);
