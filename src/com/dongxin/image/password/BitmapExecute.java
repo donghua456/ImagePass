@@ -23,7 +23,10 @@ public class BitmapExecute {
 	private static int Data_Start_Flag = 91;
 	private static int Data_End_Flag = 93;
 	private static int Data_Size_Error = -1;
-	private static int Data_Size_Bits = 32;
+//	private static int Data_Size_Bytes = 32;
+	
+	private static int Data_Size_Bytes = 10;
+	private static int Data_Size_Invalid_Byte_Flag = 32;
 
 	/**
 	 * 将数据文件隐藏入bmp文件
@@ -106,21 +109,34 @@ public class BitmapExecute {
 
 	}
 	
+//	private static void dataSizeToBMP(int dataSize, BitmapOutput bmpWriter) {
+//		int byteNum = 0; //8 bit int value: 255
+//		if (dataSize <= 255) {
+//			bmpWriter.writeByte(dataSize);
+//		} else {
+//			byteNum = dataSize / 255;
+//			for (int i = 0; i < byteNum; i++) {
+//				bmpWriter.writeByte(255);
+//			}
+//			int lastNum = (dataSize % 255);
+//			bmpWriter.writeByte(lastNum);
+//		}
+//		
+//		for(;(byteNum + 1)  <= Data_Size_Bytes; byteNum++ ){
+//			bmpWriter.writeByte(0);
+//		}
+//	}
+	
 	private static void dataSizeToBMP(int dataSize, BitmapOutput bmpWriter) {
-		int eightNum = 0; //8 bit int value: 255
-		if (dataSize <= 255) {
-			bmpWriter.writeByte(dataSize);
-		} else {
-			eightNum = dataSize / 255;
-			for (int i = 0; i < eightNum; i++) {
-				bmpWriter.writeByte(255);
+		String strDataSize = new Integer(dataSize).toString();
+		char[] arrDataSize = strDataSize.toCharArray();
+		for (int i = 0; i < Data_Size_Bytes; i++) {
+			if (i >= arrDataSize.length) {
+				bmpWriter.writeByte(Data_Size_Invalid_Byte_Flag);
+			} else {
+				int charValue = arrDataSize[i];
+				bmpWriter.writeByte(charValue);
 			}
-			int lastNum = (dataSize % 255);
-			bmpWriter.writeByte(lastNum);
-		}
-		
-		for(;(eightNum + 1) <= Data_Size_Bits; eightNum++ ){
-			bmpWriter.writeByte(0);
 		}
 	}
 	
@@ -254,17 +270,38 @@ public class BitmapExecute {
 		return true;
 	}
 	
+//	private static int getDataSize(BitmapInput bmpReader) {
+//		int dataSize = 0;
+//		for (int i = 0; i < Data_Size_Bytes; i++) {
+//			Object[] object = bmpReader.readByte(dataSize);
+//			boolean header = Boolean.parseBoolean((String) object[0]);
+//			dataSize += Integer.parseInt((String) object[1]);
+//			if (!header) {
+//				dataSize = Data_Size_Error;
+//				break;
+//			}
+//		}
+//		return dataSize;
+//	}
+	
 	private static int getDataSize(BitmapInput bmpReader) {
 		int dataSize = 0;
-		for (int i = 0; i < Data_Size_Bits; i++) {
+		String strDataSize = "";
+		for (int i = 0; i < Data_Size_Bytes; i++) {
 			Object[] object = bmpReader.readByte(dataSize);
 			boolean header = Boolean.parseBoolean((String) object[0]);
-			dataSize += Integer.parseInt((String) object[1]);
 			if (!header) {
 				dataSize = Data_Size_Error;
 				break;
 			}
+
+			int tmpNum = Integer.parseInt((String) object[1]);
+			if (Data_Size_Invalid_Byte_Flag != tmpNum) {
+				strDataSize += ((char) tmpNum);
+			}
 		}
+
+		dataSize = Integer.valueOf(strDataSize);
 		return dataSize;
 	}
 }

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.dong.password.hiden.test;
 
 import java.io.File;
