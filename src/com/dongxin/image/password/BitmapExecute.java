@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.dongxin.image.password;
 
 import java.awt.image.BufferedImage;
@@ -23,13 +20,13 @@ public class BitmapExecute {
 	private static int Data_Start_Flag = 91;
 	private static int Data_End_Flag = 93;
 	private static int Data_Size_Error = -1;
-//	private static int Data_Size_Bytes = 32;
-	
+	// private static int Data_Size_Bytes = 32;
+
 	private static int Data_Size_Bytes = 10;
 	private static int Data_Size_Invalid_Byte_Flag = 32;
 
 	/**
-	 * 将数据文件隐藏入bmp文件
+	 * Encrypt passwords into BMP file
 	 * 
 	 * @param dataFileName
 	 * @param bmpFileName
@@ -37,7 +34,7 @@ public class BitmapExecute {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean DataSourceToBMP(String dataFileName, String bmpFileName, String outFileName)
+	public static boolean Encrypt2BMPFile(String dataFileName, String bmpFileName, String outFileName)
 			throws IOException {
 		return DataSourceToBMP(new File(dataFileName), new File(bmpFileName), outFileName);
 	}
@@ -70,7 +67,7 @@ public class BitmapExecute {
 			BitmapOutput bmpWriter = new BitmapOutput(bmp);
 
 			dataSourceToBMP(dataStream, bmpWriter);
-			
+
 			saveBMP(bmpWriter, outFileName);
 		} catch (Exception ex) {
 			ex.getStackTrace();
@@ -82,7 +79,7 @@ public class BitmapExecute {
 		}
 		return true;
 	}
-	
+
 	private static void dataSourceToBMP(FileInputStream dataStream, BitmapOutput bmpWriter) throws Exception {
 		int dataSize = dataStream.available();
 		System.out.println("data size: " + dataSize);
@@ -108,25 +105,25 @@ public class BitmapExecute {
 		bmpWriter.writeByte(Data_End_Flag);
 
 	}
-	
-//	private static void dataSizeToBMP(int dataSize, BitmapOutput bmpWriter) {
-//		int byteNum = 0; //8 bit int value: 255
-//		if (dataSize <= 255) {
-//			bmpWriter.writeByte(dataSize);
-//		} else {
-//			byteNum = dataSize / 255;
-//			for (int i = 0; i < byteNum; i++) {
-//				bmpWriter.writeByte(255);
-//			}
-//			int lastNum = (dataSize % 255);
-//			bmpWriter.writeByte(lastNum);
-//		}
-//		
-//		for(;(byteNum + 1)  <= Data_Size_Bytes; byteNum++ ){
-//			bmpWriter.writeByte(0);
-//		}
-//	}
-	
+
+	// private static void dataSizeToBMP(int dataSize, BitmapOutput bmpWriter) {
+	// int byteNum = 0; //8 bit int value: 255
+	// if (dataSize <= 255) {
+	// bmpWriter.writeByte(dataSize);
+	// } else {
+	// byteNum = dataSize / 255;
+	// for (int i = 0; i < byteNum; i++) {
+	// bmpWriter.writeByte(255);
+	// }
+	// int lastNum = (dataSize % 255);
+	// bmpWriter.writeByte(lastNum);
+	// }
+	//
+	// for(;(byteNum + 1) <= Data_Size_Bytes; byteNum++ ){
+	// bmpWriter.writeByte(0);
+	// }
+	// }
+
 	private static void dataSizeToBMP(int dataSize, BitmapOutput bmpWriter) {
 		String strDataSize = new Integer(dataSize).toString();
 		char[] arrDataSize = strDataSize.toCharArray();
@@ -139,7 +136,7 @@ public class BitmapExecute {
 			}
 		}
 	}
-	
+
 	private static void saveBMP(BitmapOutput bmpWriter, String fileName) throws Exception {
 		File file = new File(fileName);
 		if (file.exists()) {
@@ -148,7 +145,7 @@ public class BitmapExecute {
 
 		saveBMP(bmpWriter.getBufferedImage(), new File(fileName));
 	}
-	
+
 	/**
 	 * Save BufferedImage转化为bmp文件保存在指定位
 	 * 
@@ -176,7 +173,7 @@ public class BitmapExecute {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean BMPToDataSource(String bmpFileName, String outFName) throws IOException {
+	public static boolean Decrypt2TXTFile(String bmpFileName, String outFName) throws IOException {
 		return BMPToDataSource(new File(bmpFileName), outFName);
 	}
 
@@ -211,30 +208,29 @@ public class BitmapExecute {
 		int count = 0;
 		try {
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+			// /////////////////////////////////////////////////////////////////////////////////////////////////
 			dataSize = getDataSize(bmpReader);
-//			for (int u = 0; u < 500; u++) {
-//				// 以对象数组返回body和验证布尔�?
-//
-//				Object[] object = bmpReader.readByte(outByte);
-//				boolean header = Boolean.parseBoolean((String) object[0]);
-//				outByte = Integer.parseInt((String) object[1]);
-//				if (!header) {
-//					throw new Exception();
-//				}
-//				dataSize |= (int) (outByte << 8 * 3);
-//				System.err.println("one step data size: " + dataSize);
-//				if (u != 3) {
-//					dataSize >>= 8;
-//				}
-//			}
-///////////////////////////////////////////////////////////////////////////////////////////////////
-			
-			
-			System.out.println();			
+			// for (int u = 0; u < 500; u++) {
+			// // 以对象数组返回body和验证布尔
+			//
+			// Object[] object = bmpReader.readByte(outByte);
+			// boolean header = Boolean.parseBoolean((String) object[0]);
+			// outByte = Integer.parseInt((String) object[1]);
+			// if (!header) {
+			// throw new Exception();
+			// }
+			// dataSize |= (int) (outByte << 8 * 3);
+			// System.err.println("one step data size: " + dataSize);
+			// if (u != 3) {
+			// dataSize >>= 8;
+			// }
+			// }
+			// /////////////////////////////////////////////////////////////////////////////////////////////////
+
+			System.out.println();
 			System.out.println("bmp to txt, data size: " + dataSize);
-			dataSize = dataSize + 2;//2 byte for data star and end flag
-			
+			dataSize = dataSize + 2;// 2 byte for data star and end flag
+
 			for (int u = 0; u < dataSize; u++) {
 				Object[] object = bmpReader.readByte(outByte);
 				boolean header = Boolean.parseBoolean((String) object[0]);
@@ -269,21 +265,21 @@ public class BitmapExecute {
 		}
 		return true;
 	}
-	
-//	private static int getDataSize(BitmapInput bmpReader) {
-//		int dataSize = 0;
-//		for (int i = 0; i < Data_Size_Bytes; i++) {
-//			Object[] object = bmpReader.readByte(dataSize);
-//			boolean header = Boolean.parseBoolean((String) object[0]);
-//			dataSize += Integer.parseInt((String) object[1]);
-//			if (!header) {
-//				dataSize = Data_Size_Error;
-//				break;
-//			}
-//		}
-//		return dataSize;
-//	}
-	
+
+	// private static int getDataSize(BitmapInput bmpReader) {
+	// int dataSize = 0;
+	// for (int i = 0; i < Data_Size_Bytes; i++) {
+	// Object[] object = bmpReader.readByte(dataSize);
+	// boolean header = Boolean.parseBoolean((String) object[0]);
+	// dataSize += Integer.parseInt((String) object[1]);
+	// if (!header) {
+	// dataSize = Data_Size_Error;
+	// break;
+	// }
+	// }
+	// return dataSize;
+	// }
+
 	private static int getDataSize(BitmapInput bmpReader) {
 		int dataSize = 0;
 		String strDataSize = "";

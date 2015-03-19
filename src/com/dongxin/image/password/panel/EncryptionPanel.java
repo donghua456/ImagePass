@@ -13,7 +13,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import com.dongxin.image.password.BitmapExecute;
+import com.dongxin.image.password.app.ImagePass;
 import com.dongxin.image.password.app.ImagePasswordConstants;
+import com.dongxin.image.password.panel.PanelConstants.PasswordDlgMode;
 
 /**
  * @author Wang Donghua Oct 15, 2014
@@ -70,12 +72,17 @@ public class EncryptionPanel extends JPanel {
 				System.err.println("Please select file");
 				return;
 			}
+			PasswordDialog.showPasswordDlg(ImagePass.getInstance(), PasswordDlgMode.Encryption);
 			try {
-				BitmapExecute.DataSourceToBMP(southPanel.getFileFullPath(), northPanel.getFileFullPath(),
+				BitmapExecute.Encrypt2BMPFile(southPanel.getFileFullPath(), northPanel.getFileFullPath(),
 						PanelUtil.createPassImageFileName(northPanel.getFileFullPath()));
 			} catch (IOException exp) {
 				exp.printStackTrace();
 			}
 		}
+		
+//		private String getPassword(){
+//			
+//		}
 	}
 }

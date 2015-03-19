@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.dongxin.image.password;
 
 import java.awt.image.BufferedImage;

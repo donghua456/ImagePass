@@ -69,7 +69,7 @@ public class DecryptionPanel extends JPanel {
 				return;
 			}
 			try {
-				BitmapExecute.BMPToDataSource(northPanel.getFileFullPath(),
+				BitmapExecute.Decrypt2TXTFile(northPanel.getFileFullPath(),
 						PanelUtil.createDecryptionTxtFileName(northPanel.getFileFullPath()));
 			} catch (IOException exp) {
 				exp.printStackTrace();

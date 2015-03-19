@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.dongxin.image.password;
 
 import java.awt.image.BufferedImage;
@@ -42,10 +39,10 @@ public class BitmapOutput {
 				g = (rgb & 0x0000ff00) >> 8;
 				b = (rgb & 0x000000ff);
 				while (true) {
-					
-					//get last bit of body
+
+					// get last bit of body
 					int curBit = (body & 1);
-					
+
 					switch (iRGB) {
 					case 0:
 						r = (r & 0xFE);
@@ -62,10 +59,10 @@ public class BitmapOutput {
 					}
 					--bits2Do;
 					--bitsLeft;
-					
-					//body move 1 bit to right direction
+
+					// body move 1 bit to right direction
 					body >>= 1;
-					
+
 					// 还原
 
 					rgb = (r << 16) | (g << 8) | b;

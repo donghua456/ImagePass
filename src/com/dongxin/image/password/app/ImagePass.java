@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.dongxin.image.password.app;
 
 import java.awt.Dimension;
